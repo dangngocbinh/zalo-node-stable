@@ -1,5 +1,5 @@
 {
-	"name": "n8n-nodes-zalo-tools",
+	"name": "n8n-nodes-zalo-stable",
 	"version": "0.6.0",
 	"description": "Các node hỗ trợ Zalo cho n8n",
 	"keywords": [

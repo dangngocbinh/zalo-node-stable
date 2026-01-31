@@ -10,3 +10,4 @@ output
 docs/node_modules
 # Ignore pnpm lock file
 pnpm-lock.yaml
+.npmrc
