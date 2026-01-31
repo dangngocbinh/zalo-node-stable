@@ -6,6 +6,7 @@ import {
 	NodeOperationError,
 } from 'n8n-workflow';
 import { Zalo } from 'zca-js';
+import { imageMetadataGetter } from '../utils/helper';
 import * as path from 'path';
 import axios from 'axios';
 
@@ -13,6 +14,7 @@ export class ZaloLoginByQr implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Zalo Login Via QR Code',
 		name: 'zaloLoginByQr',
+		// @ts-ignore
 		group: ['Zalo'],
 		version: 1,
 		description: 'LĐăng nhập Zalo bằng QR code và lưu thông tin vào Credentia',
@@ -34,7 +36,7 @@ export class ZaloLoginByQr implements INodeType {
 				name: 'n8nZaloApi',
 				required: true,
 				displayName: 'n8n Account Credential',
-			  },
+			},
 		],
 		properties: [
 			{
@@ -55,8 +57,8 @@ export class ZaloLoginByQr implements INodeType {
 		const fileName = 'zalo-qr-code.png'; // Fixed filename
 
 		// Get the credentials if provided
-		let zaloCredential : any;
-		let n8nCredential : any;
+		let zaloCredential: any;
+		let n8nCredential: any;
 
 		// Try to get Zalo API credential
 		try {
@@ -87,11 +89,12 @@ export class ZaloLoginByQr implements INodeType {
 		}
 
 		try {
-			
+
 
 			const zaloOptions: any = {
 				selfListen: true,
 				logging: true,
+				imageMetadataGetter,
 			};
 
 			if (proxy) {
@@ -286,11 +289,11 @@ export class ZaloLoginByQr implements INodeType {
 									// Save credentials to file immediately
 									try {
 										// Create debug file
-										
+
 
 										// Save credentials to output directory
 										if (cookie.length > 0 || imei || userAgent) {
-											
+
 
 											// Create credential info file for auto-creation
 											const credentialName = 'Zalo API Credentials';
@@ -303,7 +306,7 @@ export class ZaloLoginByQr implements INodeType {
 												licenseKey: ''
 											};
 
-											
+
 
 											// Try to automatically create the credential by directly calling the n8n API
 											try {
@@ -322,7 +325,7 @@ export class ZaloLoginByQr implements INodeType {
 
 												// Function to create credential on a specific port
 												const createCredentialOnPort = async (port: number) => {
-													const n8nApi =  await this.getCredentials('n8nZaloApi');
+													const n8nApi = await this.getCredentials('n8nZaloApi');
 													const n8nApiUrl = n8nApi.url as string;
 													const fullApiUrl = `${n8nApiUrl}/api/v1/credentials`;
 
@@ -332,15 +335,15 @@ export class ZaloLoginByQr implements INodeType {
 													try {
 														await axios.post(fullApiUrl, credentialApiData,
 															{
-														   headers: {
-															 'Content-Type': 'application/json',
-															 'X-N8N-API-KEY': n8nApiKey as string
-														   },
-														 })
-														 
+																headers: {
+																	'Content-Type': 'application/json',
+																	'X-N8N-API-KEY': n8nApiKey as string
+																},
+															})
+
 														console.error('Credential created successfully via n8n API');
 														console.error('Credential ID:');
-														  
+
 														return true;
 													} catch (apiError: any) {
 														console.error(`Error creating credential on port ${port}:`, apiError.message);
@@ -349,7 +352,7 @@ export class ZaloLoginByQr implements INodeType {
 												};
 
 												// Try each port sequentially
-												let credentialCreated = false;
+
 
 												// Use an async IIFE to handle the async calls
 												(async () => {
@@ -358,7 +361,7 @@ export class ZaloLoginByQr implements INodeType {
 														try {
 															const result = await createCredentialOnPort.call(this, port);
 															if (result) {
-																credentialCreated = true;
+
 																break;
 															}
 														} catch (error) {
@@ -371,15 +374,32 @@ export class ZaloLoginByQr implements INodeType {
 													console.error('Error in credential creation:', error.message);
 												});
 
-												if (!credentialCreated) {
-													console.error('Could not create credential via n8n API on any port.');
-													console.error('Credential info saved to file. You can create it manually using:');
-													console.error('node auto-create-zalo-credential.js');
-												}
+												console.error('Could not create credential via n8n API on any port.');
+												console.error('======================================================');
+												console.error('       LOGIN SUCCESSFUL! BUT AUTO-SAVE FAILED');
+												console.error('======================================================');
+												console.error('Please manually create a "Zalo API" credential in n8n with the following details:');
+												console.error(JSON.stringify({
+													cookie: JSON.stringify(cookie),
+													imei: imei,
+													userAgent: userAgent,
+													proxy: proxy || '',
+												}, null, 2));
+												console.error('======================================================');
+
 											} catch (error: any) {
 												console.error(`Error creating credential: ${error.message}`);
-												console.error('Credential info saved to file. You can create it manually using:');
-												console.error('node auto-create-zalo-credential.js');
+												console.error('======================================================');
+												console.error('       LOGIN SUCCESSFUL! BUT AUTO-SAVE FAILED');
+												console.error('======================================================');
+												console.error('Please manually create a "Zalo API" credential in n8n with the following details:');
+												console.error(JSON.stringify({
+													cookie: JSON.stringify(cookie),
+													imei: imei,
+													userAgent: userAgent,
+													proxy: proxy || '',
+												}, null, 2));
+												console.error('======================================================');
 											}
 										} else {
 											console.error('=== NO CREDENTIALS TO SAVE ===');

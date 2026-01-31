@@ -14,22 +14,20 @@ export const zaloPollOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Tạo bình chọn',
+				name: 'Tạo Bình Chọn',
 				value: 'createPoll',
 				description: 'Tạo một bình chọn mới',
-				action: 'Tạo bình chọn',
+				action: 'T o b nh ch n',
 			},
             {
-				name: 'Lấy thông tin bình chọn',
+				name: 'Lấy Thông Tin Bình Chọn',
 				value: 'getPoll',
-				description: 'Lấy thông tin bình chọn',
-				action: 'Lấy thông tin bình chọn',
+				action: 'L y th ng tin b nh ch n',
 			},
 			{
-				name: 'Khóa bình chọn',
+				name: 'Khóa Bình Chọn',
 				value: 'lockPoll',
-				description: 'Khóa bình chọn',
-				action: 'Khóa bình chọn',
+				action: 'Kh a b nh ch n',
 			},
 		],
 		default: 'createPoll',
@@ -56,7 +54,7 @@ export const zaloPollFields: INodeProperties[] = [
         description: 'ID của nhóm để tạo poll (chỉ hoạt động với nhóm)',
     },
     {
-		displayName: 'Chủ đề bình chọn',
+		displayName: 'Chủ đề Bình Chọn',
 		name: 'question',
 		type: 'string',
 		required: true,
@@ -70,17 +68,17 @@ export const zaloPollFields: INodeProperties[] = [
 		description: 'Đặt câu hỏi bình chọn',
 	},
 	{
-		displayName: 'Kiểu nhập lựa chọn',
+		displayName: 'Kiểu Nhập lựa Chọn',
 		name: 'optionInputType',
 		type: 'options',
 		options: [
 			{
-			name: 'Danh sách',
+			name: 'Danh Sách',
 			value: 'list',
 			description: 'Nhập từng lựa chọn riêng biệt',
 			},
 			{
-			name: 'Văn bản',
+			name: 'Văn Bản',
 			value: 'text',
 			description: 'Nhập tất cả lựa chọn trong một ô, phân tách bằng dấu phẩy',
 			},
@@ -95,7 +93,7 @@ export const zaloPollFields: INodeProperties[] = [
 	},
 	{
 		// Danh sách hiện tại (fixedCollection)
-		displayName: 'Các lựa chọn',
+		displayName: 'Các lựa Chọn',
 		name: 'pollOptionsCollection',
 		type: 'fixedCollection',
 		placeholder: 'Thêm lựa chọn',
@@ -119,10 +117,10 @@ export const zaloPollFields: INodeProperties[] = [
 		options: [
 			{
 			name: 'options',
-			displayName: 'Lựa chọn',
+			displayName: 'Lựa Chọn',
 			values: [
 				{
-				displayName: 'Lựa chọn',
+				displayName: 'Lựa Chọn',
 				name: 'option',
 				type: 'string',
 				default: '',
@@ -137,7 +135,7 @@ export const zaloPollFields: INodeProperties[] = [
 	},
 	{
 
-		displayName: 'Các lựa chọn',
+		displayName: 'Các lựa Chọn',
 		name: 'optionsString',
 		type: 'string',
 		default: 'Lựa chọn 1, Lựa chọn 2, Lựa chọn 3',
@@ -152,10 +150,9 @@ export const zaloPollFields: INodeProperties[] = [
 		description: 'Nhập các lựa chọn, mỗi lựa chọn phân tách bằng dấu phẩy',
 	},
     {
-		displayName: 'Thời hạn bình chọn',
+		displayName: 'Thời Hạn Bình Chọn',
 		name: 'expiredTime',
 		type: 'dateTime',
-		required: false,
 		default: '',
 		displayOptions: {
 			show: {
@@ -166,10 +163,9 @@ export const zaloPollFields: INodeProperties[] = [
 		description: 'Thời hạn bình chọn (Để trống nếu không có thời hạn)',
 	},
     {
-		displayName: 'Ghim lên đầu trò chuyện',
+		displayName: 'Ghim Lên đầU Trò Chuyện',
 		name: 'pinAct',
 		type: 'boolean',
-		required: false,
 		default: false,
 		displayOptions: {
 			show: {
@@ -180,7 +176,7 @@ export const zaloPollFields: INodeProperties[] = [
 		description: 'Tạo ghim lên đầu trò chuyện',
 	},
     {
-		displayName: 'Chọn nhiều phương án',
+		displayName: 'Chọn Nhiều Phương Án',
 		name: 'allowMultiChoices',
 		type: 'boolean',
 		required: true,
@@ -194,7 +190,7 @@ export const zaloPollFields: INodeProperties[] = [
 		description: 'Người tham gia có thể bình chọn nhiều phương án khác nhau',
 	},
     {
-		displayName: 'Có thể thêm phương án',
+		displayName: 'Có Thể Thêm Phương Án',
 		name: 'allowAddNewOption',
 		type: 'boolean',
 		required: true,
@@ -208,7 +204,7 @@ export const zaloPollFields: INodeProperties[] = [
 		description: 'Người tham gia có thể thêm phương án mới',
 	},
     {
-		displayName: 'Ẩn kết quả khi chưa bình chọn',
+		displayName: 'ẨN Kết Quả Khi chưa Bình Chọn',
 		name: 'hideVotePreview',
 		type: 'boolean',
 		required: true,
@@ -222,7 +218,7 @@ export const zaloPollFields: INodeProperties[] = [
 		description: 'Người tham gia chỉ thấy kết quả sau khi bình chọn',
 	},
     {
-		displayName: 'Ẩn người bình chọn',
+		displayName: 'ẨN Người Bình Chọn',
 		name: 'isAnonymous',
 		type: 'boolean',
 		required: true,
@@ -240,7 +236,7 @@ export const zaloPollFields: INodeProperties[] = [
 	/*                            zaloPoll:getPoll                           */
 	/* -------------------------------------------------------------------------- */
 	{
-        displayName: 'ID bình chọn',
+        displayName: 'ID Bình Chọn',
         name: 'poll_id',
         type: 'number',
         default: '',
@@ -258,7 +254,7 @@ export const zaloPollFields: INodeProperties[] = [
 	/*                            zaloPoll:lockPoll                        */
 	/* -------------------------------------------------------------------------- */
 	{
-        displayName: 'ID bình chọn',
+        displayName: 'ID Bình Chọn',
         name: 'poll_id',
         type: 'number',
         default: '',

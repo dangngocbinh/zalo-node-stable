@@ -6,7 +6,7 @@ import {
 	NodeOperationError
 } from 'n8n-workflow';
 import { API, ThreadType, Zalo } from 'zca-js';
-import { saveFile, removeFile } from '../utils/helper';
+import { saveFile, removeFile, imageMetadataGetter } from '../utils/helper';
 
 let api: API | undefined;
 
@@ -15,6 +15,7 @@ export class ZaloSendMessage implements INodeType {
 		displayName: 'Zalo Send Message',
 		name: 'zaloSendMessage',
 		icon: 'file:../shared/zalo.svg',
+		// @ts-ignore
 		group: ['Zalo'],
 		version: 4,
 		description: 'Gửi tin nhắn qua API Zalo sử dụng kết nối đăng nhập bằng cookie',
@@ -206,13 +207,13 @@ export class ZaloSendMessage implements INodeType {
 
 		// Initialize Zalo API
 		try {
-			const zalo = new Zalo();
-			api = await zalo.login({ 
+			const zalo = new Zalo({ imageMetadataGetter });
+			api = await zalo.login({
 				cookie: cookieFromCred,
-				imei: imeiFromCred, 
-				userAgent: userAgentFromCred 
+				imei: imeiFromCred,
+				userAgent: userAgentFromCred
 			});
-			
+
 			if (!api) {
 				throw new NodeOperationError(this.getNode(), 'Failed to initialize Zalo API. Check your credentials.');
 			}
@@ -266,9 +267,9 @@ export class ZaloSendMessage implements INodeType {
 					for (const attachment of attachments.attachment) {
 						let fileData;
 						if (attachment.type === 'url') {
-							 fileData = await saveFile(attachment.imageUrl);
+							fileData = await saveFile(attachment.imageUrl);
 						}
-						
+
 
 						messageContent.attachments.push(fileData);
 					}
@@ -284,12 +285,10 @@ export class ZaloSendMessage implements INodeType {
 				//Send typing event
 				try {
 					const recipentObj = {
-						id : threadId,
+						id: threadId,
 						type: type
 					}
-					const result = await api.sendTypingEvent(recipentObj.id, {
-						type: recipentObj.type
-					});
+					const result = await api.sendTypingEvent(recipentObj.id, recipentObj.type);
 					if (!!result) {
 						this.logger.info("Send! typing event")
 					}
@@ -297,12 +296,12 @@ export class ZaloSendMessage implements INodeType {
 				catch (e) {
 					this.logger.error("Cannot send typing event")
 				}
-				
+
 				// Send message
 				const response = await api.sendMessage(messageContent, threadId, type);
 
 				//Remove temp img
-				if (messageContent.attachments && messageContent.attachments.length > 0){
+				if (messageContent.attachments && messageContent.attachments.length > 0) {
 					for (const attachment of messageContent.attachments) {
 						this.logger.info(`Remove attachment: ${attachment}`);
 
@@ -321,10 +320,10 @@ export class ZaloSendMessage implements INodeType {
 						messageContent,
 					},
 				});
-				
+
 			} catch (error) {
 				this.logger.error('Error sending Zalo message:', error);
-				
+
 				if (this.continueOnFail()) {
 					returnData.push({
 						json: {

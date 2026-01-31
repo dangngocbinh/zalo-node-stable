@@ -13,27 +13,24 @@ export const zaloUserOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Chấp nhận lời mời kết bạn',
+				name: 'Chấp Nhận Lời Mời Kết Bạn',
 				value: 'acceptFriendRequest',
-				action: 'Chấp nhận lời mời kết bạn',
+				action: 'Ch p nh n l i m i k t b n',
 			},
 			{
-				name: 'Gửi lời mời kết bạn',
+				name: 'Gửi Lời Mời Kết Bạn',
 				value: 'sendFriendRequest',
-				description: 'Gửi lời mời kết bạn',
-				action: 'Gửi lời mời kết bạn',
+				action: 'G i l i m i k t b n',
 			},
 			{
-				name: 'Chặn người dùng',
+				name: 'Chặn Người Dùng',
 				value: 'blockUser',
-				description: 'Chặn người dùng',
-				action: 'Chặn người dùng',
+				action: 'Ch n ng i d ng',
 			},
 			{
-				name: 'Bỏ chặn người dùng',
+				name: 'Bỏ Chặn Người Dùng',
 				value: 'unblockUser',
-				description: 'Bỏ chặn người dùng',
-				action: 'Bỏ chặn người dùng',
+				action: 'B ch n ng i d ng',
 			},
 			// {
 			// 	name: 'Đổi ảnh đại diện',
@@ -42,40 +39,35 @@ export const zaloUserOperations: INodeProperties[] = [
 			// 	action: 'Đổi ảnh đại diện',
 			// },
 			{
-				name: 'Thay đổi cài đặt tài khoản',
+				name: 'Thay đổI Cài đặT Tài Khoản',
 				value: 'changeAccountSetting',
-				description: 'Thay đổi cài đặt tài khoản',
-				action: 'Thay đổi cài đặt tài khoản',
+				action: 'Thay i c i t t i kho n',
 			},
 			{
-				name: 'Lấy thông tin người dùng',
+				name: 'Lấy Thông Tin Người Dùng',
 				value: 'getUserInfo',
-				description: 'Lấy thông tin người dùng',
-				action: 'Lấy thông tin người dùng',
+				action: 'L y th ng tin ng i d ng',
 			},
 			{
-				name: 'Lấy danh sách bạn bè',
+				name: 'Lấy Danh Sách Bạn Bè',
 				value: 'getAllFriends',
-				description: 'Lấy danh sách bạn bè',
-				action: 'Lấy danh sách bạn bè',
+				action: 'L y danh s ch b n b',
 			},
 			{
-				name: 'Tìm kiếm người dùng',
+				name: 'Tìm Kiếm Người Dùng',
 				value: 'findUser',
-				description: 'Tìm kiếm người dùng',
-				action: 'Tìm kiếm người dùng',
+				action: 'T m ki m ng i d ng',
 			},
 			{
-				name: 'Đổi tên gợi nhớ',
+				name: 'ĐổI Tên Gợi Nhớ',
 				value: 'changeAliasName',
 				description: 'Đổi tên gợi nhớ của bạn bè',
-				action: 'Đổi tên gợi nhớ',
+				action: 'I t n g i nh',
 			},
 			{
-				name: 'Thu hồi tin nhắn',
+				name: 'Thu Hồi Tin Nhắn',
 				value: 'undoMessage',
-				description: 'Thu hồi tin nhắn',
-				action: 'Thu hồi tin nhắn',
+				action: 'Thu h i tin nh n',
 			},
 		],
 		default: 'getUserInfo',
@@ -337,7 +329,6 @@ export const zaloUserFields: INodeProperties[] = [
 		displayName: 'Language',
 		name: 'language',
 		type: 'string',
-		required: false,
 		displayOptions: {
 			show: {
 				resource: ['zaloUser'],
@@ -369,6 +360,9 @@ export const zaloUserFields: INodeProperties[] = [
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
+		typeOptions: {
+			minValue: 1,
+		},
 		required: true,
 		displayOptions: {
 			show: {
@@ -377,7 +371,7 @@ export const zaloUserFields: INodeProperties[] = [
 			},
 		},
 		default: 50,
-		description: 'Số lượng bạn bè tối đa cần lấy',
+		description: 'Max number of results to return',
 	},
 
 	// Find User
@@ -399,6 +393,9 @@ export const zaloUserFields: INodeProperties[] = [
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
+		typeOptions: {
+			minValue: 1,
+		},
 		required: true,
 		displayOptions: {
 			show: {
@@ -407,6 +404,6 @@ export const zaloUserFields: INodeProperties[] = [
 			},
 		},
 		default: 50,
-		description: 'Số lượng kết quả tối đa',
+		description: 'Max number of results to return',
 	},
 ];

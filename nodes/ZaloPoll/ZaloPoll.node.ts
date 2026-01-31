@@ -1,57 +1,59 @@
 import {
-	IExecuteFunctions,
-	INodeExecutionData,
-	INodeType,
-	INodeTypeDescription,
-	NodeOperationError,
-	// IDataObject,
+    IExecuteFunctions,
+    INodeExecutionData,
+    INodeType,
+    INodeTypeDescription,
+    NodeOperationError,
+    // IDataObject,
 } from 'n8n-workflow';
 import { zaloPollOperations, zaloPollFields } from './ZaloPollDescription';
 import { API, Zalo } from 'zca-js';
+import { imageMetadataGetter } from '../utils/helper';
 
 let api: API | undefined;
 
 export class ZaloPoll implements INodeType {
     description: INodeTypeDescription = {
-            displayName: 'Zalo Poll',
-            name: 'zaloPoll',
-            icon: 'file:../shared/zalo.svg',
-            group: ['Zalo'],
-            version: 1,
-            subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-            description: 'Quản bình chọn Zalo',
-            defaults: {
-                name: 'Zalo Poll',
+        displayName: 'Zalo Poll',
+        name: 'zaloPoll',
+        icon: 'file:../shared/zalo.svg',
+        // @ts-ignore
+        group: ['Zalo'],
+        version: 1,
+        subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
+        description: 'Quản bình chọn Zalo',
+        defaults: {
+            name: 'Zalo Poll',
+        },
+        // @ts-ignore
+        inputs: ['main'],
+        // @ts-ignore
+        outputs: ['main'],
+        credentials: [
+            {
+                name: 'zaloApi',
+                required: true,
+                displayName: 'Zalo Credential to connect with',
             },
-            // @ts-ignore
-            inputs: ['main'],
-            // @ts-ignore
-            outputs: ['main'],
-            credentials: [
-                {
-                    name: 'zaloApi',
-                    required: true,
-                    displayName: 'Zalo Credential to connect with',
-                },
-            ],
-            properties: [
-                {
-                    displayName: 'Resource',
-                    name: 'resource',
-                    type: 'options',
-                    noDataExpression: true,
-                    options: [
-                        {
-                            name: 'Poll',
-                            value: 'zaloPoll',
-                        },
-                    ],
-                    default: 'zaloPoll',
-                },
-                ...zaloPollOperations,
-                ...zaloPollFields,
-            ],
-        };
+        ],
+        properties: [
+            {
+                displayName: 'Resource',
+                name: 'resource',
+                type: 'options',
+                noDataExpression: true,
+                options: [
+                    {
+                        name: 'Poll',
+                        value: 'zaloPoll',
+                    },
+                ],
+                default: 'zaloPoll',
+            },
+            ...zaloPollOperations,
+            ...zaloPollFields,
+        ],
+    };
 
     async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
         const items = this.getInputData();
@@ -68,17 +70,17 @@ export class ZaloPoll implements INodeType {
         const imei = imeiFromCred ?? items.find((x) => x.json.imei)?.json.imei as string;
         const userAgent = userAgentFromCred ?? items.find((x) => x.json.userAgent)?.json.userAgent as string;
 
-        const zalo = new Zalo();
+        const zalo = new Zalo({ imageMetadataGetter });
         const _api = await zalo.login({ cookie, imei, userAgent });
         api = _api;
 
         if (!api) {
             throw new NodeOperationError(this.getNode(), 'No API instance found. Please make sure to provide valid credentials.');
         }
-        
+
         for (let i = 0; i < items.length; i++) {
             try {
-                
+
                 if (resource === 'zaloPoll') {
                     //Tạo bình chọn
                     if (operation === 'createPoll') {
@@ -86,32 +88,32 @@ export class ZaloPoll implements INodeType {
                         const question = this.getNodeParameter('question', i) as string;
 
                         const optionInputType = this.getNodeParameter('optionInputType', i, 'list') as string;
-                        
+
                         let options: string[] = [];
 
                         if (optionInputType === 'list') {
-                        try {
-                            const pollOptionsCollection = this.getNodeParameter('pollOptionsCollection', i, { options: [] }) as {
-                            options?: Array<{
-                                option: string;
-                            }>;
-                            };
-                            
-                            if (pollOptionsCollection?.options && Array.isArray(pollOptionsCollection.options)) {
-                            options = pollOptionsCollection.options
-                                .map(item => (item?.option || '').trim())
-                                .filter(option => option !== '');
+                            try {
+                                const pollOptionsCollection = this.getNodeParameter('pollOptionsCollection', i, { options: [] }) as {
+                                    options?: Array<{
+                                        option: string;
+                                    }>;
+                                };
+
+                                if (pollOptionsCollection?.options && Array.isArray(pollOptionsCollection.options)) {
+                                    options = pollOptionsCollection.options
+                                        .map(item => (item?.option || '').trim())
+                                        .filter(option => option !== '');
+                                }
+                            } catch (error) {
+                                throw new NodeOperationError(this.getNode(), 'Lỗi xử lý các lựa chọn: ' + (error.message || 'Lỗi không xác định'));
                             }
-                        } catch (error) {
-                            throw new NodeOperationError(this.getNode(), 'Lỗi xử lý các lựa chọn: ' + (error.message || 'Lỗi không xác định'));
-                        }
                         } else if (optionInputType === 'text') {
-                        const optionsString = this.getNodeParameter('optionsString', i, '') as string;
-                        if (optionsString && optionsString.trim() !== '') {
-                            options = optionsString.split(',')
-                            .map(option => option.trim())
-                            .filter(option => option !== '');
-                        }
+                            const optionsString = this.getNodeParameter('optionsString', i, '') as string;
+                            if (optionsString && optionsString.trim() !== '') {
+                                options = optionsString.split(',')
+                                    .map(option => option.trim())
+                                    .filter(option => option !== '');
+                            }
                         }
 
                         // Kiểm tra xem có ít nhất một lựa chọn hay không
@@ -125,10 +127,10 @@ export class ZaloPoll implements INodeType {
                         const allowAddNewOption = this.getNodeParameter('allowAddNewOption', i, true) as boolean;
                         const hideVotePreview = this.getNodeParameter('hideVotePreview', i, false) as boolean;
                         const isAnonymous = this.getNodeParameter('isAnonymous', i, false) as boolean;
-                        
+
                         // Create message content
-				        const createPollData: any = {
-					        question: question,
+                        const createPollData: any = {
+                            question: question,
                             options: options,
                             expiredTime: expiredTime,
                             pinAct: pinAct,
@@ -136,10 +138,10 @@ export class ZaloPoll implements INodeType {
                             allowAddNewOption: allowAddNewOption,
                             hideVotePreview: hideVotePreview,
                             isAnonymous: isAnonymous
-				        };
+                        };
 
                         // Log the parameters before sending
-				        this.logger.info(`Create poll with parameters: ${JSON.stringify(createPollData)}`);
+                        this.logger.info(`Create poll with parameters: ${JSON.stringify(createPollData)}`);
 
                         // Send create poll
                         if (!api) {
@@ -148,7 +150,7 @@ export class ZaloPoll implements INodeType {
 
                         const response = await api.createPoll(createPollData, groupId);
 
-                        this.logger.info('Create poll successfully', { groupId, question});
+                        this.logger.info('Create poll successfully', { groupId, question });
 
                         returnData.push({
                             json: {
@@ -165,16 +167,16 @@ export class ZaloPoll implements INodeType {
                     else if (operation === 'getPoll') {
                         const poll_id = this.getNodeParameter('poll_id', i) as string;
                         // Log the parameters before sending
-				        this.logger.info(`Get poll with parameters: ${JSON.stringify(poll_id)}`);
+                        this.logger.info(`Get poll with parameters: ${JSON.stringify(poll_id)}`);
 
                         // Send create poll
                         if (!api) {
                             throw new NodeOperationError(this.getNode(), 'Zalo API not initialized', { itemIndex: i });
                         }
 
-                        const response = await api.getPollDetail(poll_id);
+                        const response = await api.getPollDetail(parseInt(poll_id));
 
-                        this.logger.info('Get poll successfully', { response});
+                        this.logger.info('Get poll successfully', { response });
 
                         returnData.push({
                             json: {
@@ -189,7 +191,7 @@ export class ZaloPoll implements INodeType {
                         const poll_id = this.getNodeParameter('poll_id', i) as number;
 
                         // Log the parameters before sending
-				        this.logger.info(`Lock poll with parameters: ${JSON.stringify(poll_id)}`);
+                        this.logger.info(`Lock poll with parameters: ${JSON.stringify(poll_id)}`);
 
                         // Send create poll
                         if (!api) {
@@ -198,7 +200,7 @@ export class ZaloPoll implements INodeType {
 
                         const response = await api.lockPoll(poll_id);
 
-                        this.logger.info('Lock poll successfully', { response});
+                        this.logger.info('Lock poll successfully', { response });
 
                         returnData.push({
                             json: {
@@ -213,21 +215,21 @@ export class ZaloPoll implements INodeType {
 
             } catch (error) {
                 this.logger.info(`Error create poll: ${JSON.stringify(error)}`);
-				if (this.continueOnFail()) {
-					returnData.push({
-						json: {
-							error: error.message,
-						},
-						pairedItem: {
-							item: i,
-						},
-					});
-					continue;
-				}
-				throw new NodeOperationError(this.getNode(), error, {
-					itemIndex: i,
-				});
-			}
+                if (this.continueOnFail()) {
+                    returnData.push({
+                        json: {
+                            error: error.message,
+                        },
+                        pairedItem: {
+                            item: i,
+                        },
+                    });
+                    continue;
+                }
+                throw new NodeOperationError(this.getNode(), error, {
+                    itemIndex: i,
+                });
+            }
         }
 
         return [returnData];

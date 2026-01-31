@@ -1,5 +1,6 @@
 import { INodeType, INodeTypeDescription, IExecuteFunctions, INodeExecutionData, NodeApiError } from 'n8n-workflow';
 import { API, Zalo } from 'zca-js';
+import { imageMetadataGetter } from '../utils/helper';
 
 let api: API | undefined;
 
@@ -14,9 +15,9 @@ export class ZaloTag implements INodeType {
             name: 'Zalo Tag',
         },
         icon: 'file:../shared/zalo.svg',
-						// @ts-ignore
+        // @ts-ignore
         inputs: ['main'],
-						// @ts-ignore
+        // @ts-ignore
         outputs: ['main'],
         credentials: [
             {
@@ -35,7 +36,7 @@ export class ZaloTag implements INodeType {
                         name: 'Danh Sách Thẻ',
                         value: 'list',
                         description: 'Liệt kê tất cả các thẻ',
-												action: 'List'
+                        action: 'List'
                     },
                 ],
                 default: 'list',
@@ -55,7 +56,7 @@ export class ZaloTag implements INodeType {
         const userAgentFromCred = zaloCred.userAgent as string;
 
         try {
-            const zalo = new Zalo();
+            const zalo = new Zalo({ imageMetadataGetter });
             api = await zalo.login({
                 cookie: cookieFromCred,
                 imei: imeiFromCred,

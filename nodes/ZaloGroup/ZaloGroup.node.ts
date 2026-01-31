@@ -8,6 +8,7 @@ import {
 } from 'n8n-workflow';
 import { zaloGroupOperations, zaloGroupFields } from './ZaloGroupDescription';
 import { API, Zalo } from 'zca-js';
+import { imageMetadataGetter } from '../utils/helper';
 
 let api: API | undefined;
 
@@ -16,6 +17,7 @@ export class ZaloGroup implements INodeType {
 		displayName: 'Zalo Group',
 		name: 'zaloGroup',
 		icon: 'file:../shared/zalo.svg',
+		// @ts-ignore
 		group: ['Zalo'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
@@ -68,7 +70,7 @@ export class ZaloGroup implements INodeType {
 		const imei = imeiFromCred ?? items.find((x) => x.json.imei)?.json.imei as string;
 		const userAgent = userAgentFromCred ?? items.find((x) => x.json.userAgent)?.json.userAgent as string;
 
-		const zalo = new Zalo();
+		const zalo = new Zalo({ imageMetadataGetter });
 		const _api = await zalo.login({ cookie, imei, userAgent });
 		api = _api;
 
@@ -120,11 +122,11 @@ export class ZaloGroup implements INodeType {
 						const response = await api.addGroupDeputy(groupId, userId);
 
 						returnData.push({
-							json: 
-                            {
-                                status: "Thành công",
+							json:
+							{
+								status: "Thành công",
 								response: response,
-                            },
+							},
 							pairedItem: {
 								item: i,
 							},
@@ -155,11 +157,11 @@ export class ZaloGroup implements INodeType {
 						const response = await api.changeGroupAvatar(groupId, imageUrl);
 
 						returnData.push({
-							json: 
-                            {
-                                status: "Thành công",
+							json:
+							{
+								status: "Thành công",
 								response: response,
-                            },
+							},
 							pairedItem: {
 								item: i,
 							},
@@ -187,12 +189,12 @@ export class ZaloGroup implements INodeType {
 						const limit = this.getNodeParameter('limit', i) as number;
 
 						const response = await api.getGroupInfo(groupId);
-                        const groupInfo = response.gridInfoMap[groupId];
+						const groupInfo = response.gridInfoMap[groupId];
 						const members = groupInfo.memberIds?.slice(0, limit) || [];
-                        const admins = groupInfo.adminIds || [];
-                        const currentMems = groupInfo.currentMems || [];
-                        const updateMems = groupInfo.updateMems || [];
-                        const totalMember = groupInfo.totalMember || 0;
+						const admins = groupInfo.adminIds || [];
+						const currentMems = groupInfo.currentMems || [];
+						const updateMems = groupInfo.updateMems || [];
+						const totalMember = groupInfo.totalMember || 0;
 
 						returnData.push({
 							json: { members, admins, currentMems, updateMems, totalMember } as IDataObject,

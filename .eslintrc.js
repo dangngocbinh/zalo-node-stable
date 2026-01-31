@@ -23,7 +23,7 @@ module.exports = {
 	overrides: [
 		{
 			files: ['package.json'],
-			plugins: ['eslint-plugin-n8n-nodes-base'],
+			plugins: ['eslint-plugin-n8n-nodes-base', '@typescript-eslint'],
 			extends: ['plugin:n8n-nodes-base/community'],
 			rules: {
 				'n8n-nodes-base/community-package-json-name-still-default': 'off',
@@ -40,7 +40,7 @@ module.exports = {
 		// },
 		{
 			files: ['./nodes/**/*.ts'],
-			plugins: ['eslint-plugin-n8n-nodes-base'],
+			plugins: ['eslint-plugin-n8n-nodes-base', '@typescript-eslint'],
 			extends: ['plugin:n8n-nodes-base/nodes'],
 			rules: {
 				'n8n-nodes-base/node-execute-block-missing-continue-on-fail': 'off',

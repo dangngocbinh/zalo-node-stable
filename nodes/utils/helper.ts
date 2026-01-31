@@ -44,3 +44,36 @@ export function removeFile(filePath: string): void {
 		console.error('Lỗi khi xoá file:', error);
 	}
 }
+
+export async function imageMetadataGetter(filePath: string) {
+	try {
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		const sharp = require('sharp');
+		const data = await fs.promises.readFile(filePath);
+		const metadata = await sharp(data).metadata();
+		return {
+			height: metadata.height,
+			width: metadata.width,
+			size: metadata.size || data.length,
+		};
+	} catch (error) {
+		console.error('Error getting image metadata:', error);
+		// Fallback for non-image files or if sharp is missing.
+		// Though zca-js might expect this to work for images.
+		// If it fails, maybe return default or rethrow.
+		try {
+			const stats = await fs.promises.stat(filePath);
+			return {
+				height: 0,
+				width: 0,
+				size: stats.size
+			}
+		} catch (e) {
+			return {
+				height: 0,
+				width: 0,
+				size: 0
+			}
+		}
+	}
+}

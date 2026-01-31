@@ -17,61 +17,60 @@ export const zaloGroupOperations: INodeProperties[] = [
 				name: 'Tạo Nhóm',
 				value: 'createGroup',
 				description: 'Tạo một nhóm mới',
-				action: 'Tạo Nhóm',
+				action: 'T o nh m',
 			},
 			{
 				name: 'Lấy Thông Tin Nhóm',
 				value: 'getGroupInfo',
 				description: 'Lấy thông tin của một nhóm',
-				action: 'Lấy Thông Tin Nhóm',
+				action: 'L y th ng tin nh m',
 			},
 			{
 				name: 'Thêm Phó Nhóm',
 				value: 'addGroupDeputy',
 				description: 'Thêm phó nhóm cho một nhóm',
-				action: 'Thêm Phó Nhóm',
+				action: 'Th m ph nh m',
 			},
 			{
 				name: 'Thêm Thành Viên Vào Nhóm',
 				value: 'addUserToGroup',
-				description: 'Thêm thành viên vào nhóm',
-				action: 'Thêm Thành Viên Vào Nhóm',
+				action: 'Th m th nh vi n v o nh m',
 			},
 			{
-				name: 'Đổi Avatar Nhóm',
+				name: 'ĐổI Avatar Nhóm',
 				value: 'changeGroupAvatar',
 				description: 'Đổi avatar của nhóm',
-				action: 'Đổi Avatar Nhóm',
+				action: 'I avatar nh m',
 			},
 			{
-				name: 'Đổi Tên Nhóm',
+				name: 'ĐổI Tên Nhóm',
 				value: 'changeGroupName',
 				description: 'Đổi tên của nhóm',
-				action: 'Đổi Tên Nhóm',
+				action: 'I t n nh m',
 			},
 			{
 				name: 'Lấy Danh Sách Thành Viên',
 				value: 'getGroupMembers',
 				description: 'Lấy danh sách thành viên của nhóm',
-				action: 'Lấy Danh Sách Thành Viên',
+				action: 'L y danh s ch th nh vi n',
 			},
 			{
 				name: 'Lấy Tất Cả Nhóm',
 				value: 'getAllGroups',
 				description: 'Lấy danh sách tất cả các nhóm',
-				action: 'Lấy Tất Cả Nhóm',
+				action: 'L y t t c nh m',
 			},
 			{
 				name: 'Xóa Thành Viên Khỏi Nhóm',
 				value: 'removeUserFromGroup',
 				description: 'Xóa thành ra viên khỏi nhóm',
-				action: 'Xóa Thành Viên Khỏi Nhóm',
+				action: 'X a th nh vi n kh i nh m',
 			},
 			{
 				name: 'Tạo Ghi Chú',
 				value: 'createNote',
 				description: 'Tạo ghi chú trong nhóm',
-				action: 'Tạo Ghi Chú',
+				action: 'T o ghi ch',
 			},
 		],
 		default: 'createGroup',
@@ -98,7 +97,7 @@ export const zaloGroupFields: INodeProperties[] = [
 		description: 'Tên của nhóm mới',
 	},
 	{
-		displayName: 'Danh Sách ID Thành Viên (nếu nhiều người dùng vui lòng phân cách bằng dấu phẩy)',
+		displayName: 'Danh Sách ID Thành Viên (Nếu Nhiều Người Dùng Vui Lòng Phân Cách Bằng Dấu Phẩy)',
 		name: 'userIds',
 		type: 'string',
 		required: true,
@@ -180,7 +179,7 @@ export const zaloGroupFields: INodeProperties[] = [
 		description: 'ID của nhóm',
 	},
 	{
-		displayName: 'Danh Sách ID Thành Viên (nếu nhiều người dùng vui lòng phân cách bằng dấu phẩy)',
+		displayName: 'Danh Sách ID Thành Viên (Nếu Nhiều Người Dùng Vui Lòng Phân Cách Bằng Dấu Phẩy)',
 		name: 'userIds',
 		type: 'string',
 		required: true,
@@ -212,7 +211,7 @@ export const zaloGroupFields: INodeProperties[] = [
 		description: 'ID của nhóm',
 	},
 	{
-		displayName: 'URL Ảnh',
+		displayName: 'URL ẢNh',
 		name: 'imageUrl',
 		type: 'string',
 		required: true,
@@ -279,6 +278,9 @@ export const zaloGroupFields: INodeProperties[] = [
 		displayName: 'Giới Hạn',
 		name: 'limit',
 		type: 'number',
+		typeOptions: {
+			minValue: 1,
+		},
 		default: 50,
 		required: true,
 		displayOptions: {
@@ -287,7 +289,7 @@ export const zaloGroupFields: INodeProperties[] = [
 				operation: ['getGroupMembers'],
 			},
 		},
-		description: 'Số lượng thành viên tối đa cần lấy',
+		description: 'Max number of results to return',
 	},
 
 	/* -------------------------------------------------------------------------- */
@@ -297,6 +299,9 @@ export const zaloGroupFields: INodeProperties[] = [
 		displayName: 'Giới Hạn',
 		name: 'limit',
 		type: 'number',
+		typeOptions: {
+			minValue: 1,
+		},
 		default: 50,
 		required: true,
 		displayOptions: {
@@ -305,7 +310,7 @@ export const zaloGroupFields: INodeProperties[] = [
 				operation: ['getAllGroups'],
 			},
 		},
-		description: 'Số lượng nhóm tối đa cần lấy',
+		description: 'Max number of results to return',
 	},
 
 	/* -------------------------------------------------------------------------- */
@@ -326,7 +331,7 @@ export const zaloGroupFields: INodeProperties[] = [
 		description: 'ID của nhóm',
 	},
 	{
-		displayName: 'ID Người Dùng (nếu nhiều người dùng vui lòng phân cách bằng dấu phẩy)',
+		displayName: 'ID Người Dùng (Nếu Nhiều Người Dùng Vui Lòng Phân Cách Bằng Dấu Phẩy)',
 		name: 'userIds',
 		type: 'string',
 		required: true,
