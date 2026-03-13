@@ -85,7 +85,7 @@ export class ZaloFriendTrigger implements INodeType {
 			});
 
 			// Start listening
-			api.listener.start();
+			api.listener.start({ retryOnClose: true });
 
 			return {
 				closeFunction: async () => {

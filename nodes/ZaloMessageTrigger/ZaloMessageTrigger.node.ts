@@ -94,7 +94,7 @@ export class ZaloMessageTrigger implements INodeType {
 			});
 
 			// Start listening
-			api.listener.start();
+			api.listener.start({ retryOnClose: true });
 
 			// Return close function
 			return {
