@@ -56,50 +56,73 @@ export class ZaloFriendTrigger implements INodeType {
 			throw new NodeOperationError(this.getNode(), 'No credentials found');
 		}
 
+		const cookieFromCred = JSON.parse(credentials.cookie as string);
+		const imeiFromCred = credentials.imei as string;
+		const userAgentFromCred = credentials.userAgent as string;
+
 		let api: API | undefined;
+		let stopped = false;
+		let reconnectTimeout: ReturnType<typeof setTimeout> | undefined;
 
-		try {
-			const cookieFromCred = JSON.parse(credentials.cookie as string);
-			const imeiFromCred = credentials.imei as string;
-			const userAgentFromCred = credentials.userAgent as string;
+		const startListening = async (): Promise<void> => {
+			if (stopped) return;
 
-			const zalo = new Zalo({ imageMetadataGetter });
-			api = await zalo.login({ cookie: cookieFromCred, imei: imeiFromCred, userAgent: userAgentFromCred });
-
-			if (!api) {
-				throw new NodeOperationError(
-					this.getNode(),
-					'No API instance found. Please make sure to provide valid credentials.',
-				);
-			}
-
-			// Add friend event listener
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			api.listener.on('friend_event', async (event: any) => {
-				const friendEvent = event as FriendEvent;
-				const nodeEventTypes = this.getNodeParameter('eventTypes') as FriendEventType[];
-
-				if (nodeEventTypes.includes(friendEvent.type)) {
-					this.emit([this.helpers.returnJsonArray({ friendEvent: friendEvent.data })]);
+			try {
+				if (api) {
+					api.listener.stop();
+					api = undefined;
 				}
-			});
 
-			// Start listening
-			api.listener.start({ retryOnClose: true });
+				const zalo = new Zalo({ imageMetadataGetter });
+				api = await zalo.login({ cookie: cookieFromCred, imei: imeiFromCred, userAgent: userAgentFromCred });
 
-			return {
-				closeFunction: async () => {
-					if (api) {
-						api.listener.stop();
-						api = undefined;
+				if (!api) {
+					throw new NodeOperationError(this.getNode(), 'No API instance returned');
+				}
+
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				api.listener.on('friend_event', async (event: any) => {
+					const friendEvent = event as FriendEvent;
+					const nodeEventTypes = this.getNodeParameter('eventTypes') as FriendEventType[];
+
+					if (nodeEventTypes.includes(friendEvent.type)) {
+						this.emit([this.helpers.returnJsonArray({ friendEvent: friendEvent.data })]);
 					}
-				},
-			};
-		} catch (error) {
-			if (api) {
-				api.listener.stop();
+				});
+
+				api.listener.on('closed', (code, reason) => {
+					this.logger.warn(`[ZaloFriendTrigger] Listener closed (code=${code}, reason=${reason}). Re-logging in...`);
+					if (!stopped) {
+						reconnectTimeout = setTimeout(() => startListening(), 5000);
+					}
+				});
+
+				api.listener.on('error', (error) => {
+					this.logger.error(`[ZaloFriendTrigger] Listener error: ${error}`);
+				});
+
+				api.listener.start({ retryOnClose: true });
+			} catch (error) {
+				this.logger.error(`[ZaloFriendTrigger] Login failed: ${(error as Error).message}. Retrying in 10s...`);
+				if (!stopped) {
+					reconnectTimeout = setTimeout(() => startListening(), 10000);
+				}
 			}
-			throw new NodeOperationError(this.getNode(), 'Zalo connection failed. ' + (error as Error).message);
-		}
+		};
+
+		await startListening();
+
+		return {
+			closeFunction: async () => {
+				stopped = true;
+				if (reconnectTimeout) {
+					clearTimeout(reconnectTimeout);
+				}
+				if (api) {
+					api.listener.stop();
+					api = undefined;
+				}
+			},
+		};
 	}
 }

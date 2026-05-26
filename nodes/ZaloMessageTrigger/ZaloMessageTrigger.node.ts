@@ -69,47 +69,71 @@ export class ZaloMessageTrigger implements INodeType {
 			throw new NodeOperationError(this.getNode(), 'No credentials found');
 		}
 
+		const cookieFromCred = JSON.parse(credentials.cookie as string);
+		const imeiFromCred = credentials.imei as string;
+		const userAgentFromCred = credentials.userAgent as string;
+		const selfListen = this.getNodeParameter('selfListen') as boolean;
+
 		let api: API | undefined;
+		let stopped = false;
+		let reconnectTimeout: ReturnType<typeof setTimeout> | undefined;
 
-		try {
-			const cookieFromCred = JSON.parse(credentials.cookie as string);
-			const imeiFromCred = credentials.imei as string;
-			const userAgentFromCred = credentials.userAgent as string;
+		const startListening = async (): Promise<void> => {
+			if (stopped) return;
 
-			const selfListen = this.getNodeParameter('selfListen') as boolean;
-			const zalo = new Zalo({ selfListen, imageMetadataGetter });
-			api = await zalo.login({ cookie: cookieFromCred, imei: imeiFromCred, userAgent: userAgentFromCred });
+			try {
+				if (api) {
+					api.listener.stop();
+					api = undefined;
+				}
 
-			if (!api) {
-				throw new NodeOperationError(
-					this.getNode(),
-					'No API instance found. Please make sure to provide valid credentials.',
-				);
-			}
+				const zalo = new Zalo({ selfListen, imageMetadataGetter });
+				api = await zalo.login({ cookie: cookieFromCred, imei: imeiFromCred, userAgent: userAgentFromCred });
 
-			// Add message event listener
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			api.listener.on('message', async (message: any) => {
-				this.emit([this.helpers.returnJsonArray({ message })]);
-			});
+				if (!api) {
+					throw new NodeOperationError(this.getNode(), 'No API instance returned');
+				}
 
-			// Start listening
-			api.listener.start({ retryOnClose: true });
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				api.listener.on('message', async (message: any) => {
+					this.emit([this.helpers.returnJsonArray({ message })]);
+				});
 
-			// Return close function
-			return {
-				closeFunction: async () => {
-					if (api) {
-						api.listener.stop();
-						api = undefined;
+				// When all retries are exhausted or close code is not retryable,
+				// listener emits 'closed' and stops permanently — re-login and restart
+				api.listener.on('closed', (code, reason) => {
+					this.logger.warn(`[ZaloMessageTrigger] Listener closed (code=${code}, reason=${reason}). Re-logging in...`);
+					if (!stopped) {
+						reconnectTimeout = setTimeout(() => startListening(), 5000);
 					}
-				},
-			};
-		} catch (error) {
-			if (api) {
-				api.listener.stop();
+				});
+
+				api.listener.on('error', (error) => {
+					this.logger.error(`[ZaloMessageTrigger] Listener error: ${error}`);
+				});
+
+				api.listener.start({ retryOnClose: true });
+			} catch (error) {
+				this.logger.error(`[ZaloMessageTrigger] Login failed: ${(error as Error).message}. Retrying in 10s...`);
+				if (!stopped) {
+					reconnectTimeout = setTimeout(() => startListening(), 10000);
+				}
 			}
-			throw new NodeOperationError(this.getNode(), 'Zalo connection failed. ' + (error as Error).message);
-		}
+		};
+
+		await startListening();
+
+		return {
+			closeFunction: async () => {
+				stopped = true;
+				if (reconnectTimeout) {
+					clearTimeout(reconnectTimeout);
+				}
+				if (api) {
+					api.listener.stop();
+					api = undefined;
+				}
+			},
+		};
 	}
 }

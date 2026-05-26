@@ -282,21 +282,6 @@ export class ZaloSendMessage implements INodeType {
 					throw new NodeOperationError(this.getNode(), 'Zalo API not initialized');
 				}
 
-				//Send typing event
-				try {
-					const recipentObj = {
-						id: threadId,
-						type: type
-					}
-					const result = await api.sendTypingEvent(recipentObj.id, recipentObj.type);
-					if (!!result) {
-						this.logger.info("Send! typing event")
-					}
-				}
-				catch (e) {
-					this.logger.error("Cannot send typing event")
-				}
-
 				// Send message
 				const response = await api.sendMessage(messageContent, threadId, type);
 
