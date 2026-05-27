@@ -2,9 +2,11 @@ import axios from 'axios';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { imageSize } from 'image-size';
 
 /**
- * Tải file bất kỳ (ảnh, pdf, zip...) và lưu vào thư mục tạm trong n8n
+ * Tải file bất kỳ (ảnh, pdf, zip...) và lưu vào thư mục tạm trong n8n.
+ * Không cần sharp hay bất kỳ native module nào.
  */
 export async function saveFile(url: string): Promise<string | null> {
 	try {
@@ -15,16 +17,27 @@ export async function saveFile(url: string): Promise<string | null> {
 			fs.mkdirSync(dataStoragePath, { recursive: true });
 		}
 
-		// Lấy phần mở rộng từ URL (nếu có), ví dụ: .png, .pdf
+		// Lấy phần mở rộng từ URL
 		const urlPath = new URL(url).pathname;
-		const ext = path.extname(urlPath) || '.bin';
+		const rawExt = path.extname(urlPath).toLowerCase() || '';
+
+		const { data, headers } = await axios.get(url, { responseType: 'arraybuffer' });
+
+		// Fallback extension từ Content-Type nếu URL không có extension
+		const contentType = (headers['content-type'] || '').toLowerCase();
+		let ext = rawExt;
+		if (!ext) {
+			if (contentType.includes('jpeg') || contentType.includes('jpg')) ext = '.jpg';
+			else if (contentType.includes('png')) ext = '.png';
+			else if (contentType.includes('webp')) ext = '.webp';
+			else if (contentType.includes('gif')) ext = '.gif';
+			else if (contentType.includes('mp4')) ext = '.mp4';
+			else ext = '.bin';
+		}
 
 		const timestamp = Date.now();
 		const filePath = path.join(dataStoragePath, `temp-${timestamp}${ext}`);
-
-		const { data } = await axios.get(url, { responseType: 'arraybuffer' });
-		fs.writeFileSync(filePath, data); // đúng kiểu nhị phân
-
+		fs.writeFileSync(filePath, Buffer.from(data));
 		return filePath;
 	} catch (error) {
 		console.error('Lỗi khi tải/lưu file:', error);
@@ -45,35 +58,26 @@ export function removeFile(filePath: string): void {
 	}
 }
 
+/**
+ * Lấy metadata ảnh dùng image-size (pure JS, không cần native module).
+ * Được zca-js gọi khi upload ảnh để lấy width/height/size.
+ */
 export async function imageMetadataGetter(filePath: string) {
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const sharp = require('sharp');
 		const data = await fs.promises.readFile(filePath);
-		const metadata = await sharp(data).metadata();
+		const dimensions = imageSize(data);
 		return {
-			height: metadata.height,
-			width: metadata.width,
-			size: metadata.size || data.length,
+			width: dimensions.width ?? 0,
+			height: dimensions.height ?? 0,
+			size: data.length,
 		};
 	} catch (error) {
 		console.error('Error getting image metadata:', error);
-		// Fallback for non-image files or if sharp is missing.
-		// Though zca-js might expect this to work for images.
-		// If it fails, maybe return default or rethrow.
 		try {
 			const stats = await fs.promises.stat(filePath);
-			return {
-				height: 0,
-				width: 0,
-				size: stats.size
-			}
-		} catch (e) {
-			return {
-				height: 0,
-				width: 0,
-				size: 0
-			}
+			return { width: 0, height: 0, size: stats.size };
+		} catch {
+			return { width: 0, height: 0, size: 0 };
 		}
 	}
 }

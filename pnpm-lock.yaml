@@ -11,6 +11,9 @@ importers:
       axios:
         specifier: ^1.8.4
         version: 1.8.4
+      image-size:
+        specifier: ^2.0.2
+        version: 2.0.2
       n8n-core:
         specifier: '>=1.0.0'
         version: 1.14.1(n8n-nodes-base@1.14.1(asn1.js@5.4.1)(promise-ftp-common@1.1.5))
@@ -18,8 +21,8 @@ importers:
         specifier: ^10.6.5
         version: 10.8.1
       zca-js:
-        specifier: ^2.0.4
-        version: 2.0.4
+        specifier: ^2.1.2
+        version: 2.1.2
     optionalDependencies:
       sharp:
         specifier: ^0.32.1
@@ -2217,6 +2220,10 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
+  hasown@2.0.3:
+    resolution: {integrity: sha512-ej4AhfhfL2Q2zpMmLo7U1Uv9+PyhIZpgQLGT1F9miIGmiCJIoCgSmczFdrc97mWT4kVY72KA+WnnhJ5pghSvSg==}
+    engines: {node: '>= 0.4'}
+
   he@1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
@@ -2291,6 +2298,11 @@ packages:
   ignore@7.0.5:
     resolution: {integrity: sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==}
     engines: {node: '>= 4'}
+
+  image-size@2.0.2:
+    resolution: {integrity: sha512-IRqXKlaXwgSMAMtpNzZa1ZAe8m+Sa1770Dhk8VkSsP9LS+iHD62Zd8FQKs8fbPiagBE7BzoFX23cxFnwshpV6w==}
+    engines: {node: '>=16.x'}
+    hasBin: true
 
   imap-simple@4.3.0:
     resolution: {integrity: sha512-SW3LtfEJFjlJKS/h2CmpX2IKpya2RXobR3ENJJW4iMQ3QYPxWxf5oeaz1K3P4eGUwfGEndkqt7uVDKnEyG9zeQ==}
@@ -3709,6 +3721,11 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  semver@7.8.1:
+    resolution: {integrity: sha512-rkVq3IXh+4FDGch+KwzX3aV9W3kO54GyEgpvBzSyctDA6Xtd7RJQV1xmXbeQp5v7+VzLOfVqiutSE6GICgPFvg==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   sentence-case@3.0.4:
     resolution: {integrity: sha512-8LS0JInaQMCRoQ7YUytAo/xUu5W2XnQxV2HI/6uM6U7CITS1RqPElr30V6uIqyMKM9lJGRVFy5/4CuzcixNYSg==}
 
@@ -4406,8 +4423,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.19.0:
-    resolution: {integrity: sha512-blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg==}
+  ws@8.21.0:
+    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -4475,8 +4492,8 @@ packages:
     resolution: {integrity: sha512-Z2Fe1bn+eLstG8DRR6FTavGD+MeAwyfmouhHsIUgaADz8jvFKbO/fXc2trJKZg+5EBjh4gGm3iU/t3onKlXHIg==}
     engines: {node: '>=10'}
 
-  zca-js@2.0.4:
-    resolution: {integrity: sha512-rxa2mV1N6UAxyIjQVdCXyiBmbqu/qZtCsXkfYhjU7rVxThvHYbBvtCMN+XXOkc13GRSrT8MNGGzD4B6bQU+QFw==}
+  zca-js@2.1.2:
+    resolution: {integrity: sha512-82+zCqoIXnXEF6C9YuN3Kf7WKlyyujY/6Ejl2n8PkwazYkBK0k7kiPd8S7nHvC5Wl7vjwGRhDYeAM8zTHyoRxQ==}
     engines: {node: '>=18.0.0'}
 
   zod@3.25.67:
@@ -7353,7 +7370,7 @@ snapshots:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       es-set-tostringtag: 2.1.0
-      hasown: 2.0.2
+      hasown: 2.0.3
       mime-types: 2.1.35
 
   fragment-cache@0.2.1:
@@ -7661,6 +7678,10 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
+  hasown@2.0.3:
+    dependencies:
+      function-bind: 1.1.2
+
   he@1.2.0: {}
 
   header-case@2.0.4:
@@ -7751,6 +7772,8 @@ snapshots:
   ignore@5.3.2: {}
 
   ignore@7.0.5: {}
+
+  image-size@2.0.2: {}
 
   imap-simple@4.3.0:
     dependencies:
@@ -7955,7 +7978,7 @@ snapshots:
       call-bound: 1.0.4
       gopd: 1.2.0
       has-tostringtag: 1.0.2
-      hasown: 2.0.2
+      hasown: 2.0.3
 
   is-relative@1.0.0:
     dependencies:
@@ -9397,6 +9420,8 @@ snapshots:
 
   semver@7.7.3: {}
 
+  semver@7.8.1: {}
+
   sentence-case@3.0.4:
     dependencies:
       no-case: 3.0.4
@@ -10311,7 +10336,7 @@ snapshots:
 
   ws@8.18.1: {}
 
-  ws@8.19.0: {}
+  ws@8.21.0: {}
 
   xlsx@https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz: {}
 
@@ -10382,16 +10407,16 @@ snapshots:
       property-expr: 2.0.6
       toposort: 2.0.2
 
-  zca-js@2.0.4:
+  zca-js@2.1.2:
     dependencies:
       crypto-js: 4.2.0
       form-data: 4.0.5
       json-bigint: 1.0.0
       pako: 2.1.0
-      semver: 7.7.3
+      semver: 7.8.1
       spark-md5: 3.0.2
       tough-cookie: 5.1.2
-      ws: 8.19.0
+      ws: 8.21.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate

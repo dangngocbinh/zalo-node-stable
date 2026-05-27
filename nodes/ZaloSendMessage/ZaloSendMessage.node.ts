@@ -148,6 +148,25 @@ export class ZaloSendMessage implements INodeType {
 				],
 			},
 			{
+				displayName: 'Attachments Mode',
+				name: 'attachmentsMode',
+				type: 'options',
+				options: [
+					{
+						name: 'Fixed',
+						value: 'fixed',
+						description: 'Thêm từng attachment thủ công',
+					},
+					{
+						name: 'Dynamic',
+						value: 'dynamic',
+						description: 'Nhập array URLs qua expression (vd: {{ $JSON.imageUrls }})',
+					},
+				],
+				default: 'fixed',
+				description: 'Chế độ nhập attachment: cố định từng item hoặc dynamic qua array',
+			},
+			{
 				displayName: 'Attachments',
 				name: 'attachments',
 				type: 'fixedCollection',
@@ -156,6 +175,11 @@ export class ZaloSendMessage implements INodeType {
 				},
 				placeholder: 'Add Attachment',
 				default: {},
+				displayOptions: {
+					show: {
+						attachmentsMode: ['fixed'],
+					},
+				},
 				options: [
 					{
 						name: 'attachment',
@@ -189,7 +213,19 @@ export class ZaloSendMessage implements INodeType {
 						],
 					},
 				],
-				description: 'Một hoặc nhiều ảnh đính kèm để gửi',
+				description: 'Một hoặc nhiều ảnh đính kèm để gửi (chế độ Fixed)',
+			},
+			{
+				displayName: 'Attachment URLs (Array)',
+				name: 'attachmentUrlsDynamic',
+				type: 'string',
+				default: '',
+				displayOptions: {
+					show: {
+						attachmentsMode: ['dynamic'],
+					},
+				},
+				description: 'Array các URL ảnh/file. Nhập expression trả về mảng string, vd: <code>={{ $JSON.imageUrls }}</code> hoặc JSON string như <code>["url1","url2"]</code>',
 			},
 		],
 	};
@@ -231,7 +267,9 @@ export class ZaloSendMessage implements INodeType {
 				const urgency = this.getNodeParameter('urgency', i, 0) as number;
 				const quote = this.getNodeParameter('quote', i, {}) as any;
 				const mentions = this.getNodeParameter('mentions', i, {}) as any;
+				const attachmentsMode = this.getNodeParameter('attachmentsMode', i, 'fixed') as string;
 				const attachments = this.getNodeParameter('attachments', i, {}) as any;
+				const attachmentUrlsDynamic = this.getNodeParameter('attachmentUrlsDynamic', i, '') as string;
 
 				// Create message content
 				const messageContent: any = {
@@ -262,16 +300,50 @@ export class ZaloSendMessage implements INodeType {
 				}
 
 				// Add attachments if specified
-				if (attachments && attachments.attachment && attachments.attachment.length > 0) {
-					messageContent.attachments = [];
-					for (const attachment of attachments.attachment) {
-						let fileData;
-						if (attachment.type === 'url') {
-							fileData = await saveFile(attachment.imageUrl);
+				if (attachmentsMode === 'fixed') {
+					// Fixed mode: dùng fixedCollection
+					if (attachments && attachments.attachment && attachments.attachment.length > 0) {
+						messageContent.attachments = [];
+						for (const attachment of attachments.attachment) {
+							let fileData;
+							if (attachment.type === 'url') {
+								fileData = await saveFile(attachment.imageUrl);
+							}
+							messageContent.attachments.push(fileData);
+						}
+					}
+				} else if (attachmentsMode === 'dynamic') {
+					// Dynamic mode: parse array URLs từ expression
+					if (attachmentUrlsDynamic) {
+						let urlArray: string[] = [];
+
+						if (Array.isArray(attachmentUrlsDynamic)) {
+							// Expression đã resolve thành array
+							urlArray = attachmentUrlsDynamic as unknown as string[];
+						} else if (typeof attachmentUrlsDynamic === 'string' && attachmentUrlsDynamic.trim()) {
+							// Thử parse JSON string
+							try {
+								const parsed = JSON.parse(attachmentUrlsDynamic);
+								if (Array.isArray(parsed)) {
+									urlArray = parsed;
+								} else if (typeof parsed === 'string') {
+									urlArray = [parsed];
+								}
+							} catch {
+								// Nếu không phải JSON, coi như single URL
+								urlArray = [attachmentUrlsDynamic.trim()];
+							}
 						}
 
-
-						messageContent.attachments.push(fileData);
+						if (urlArray.length > 0) {
+							messageContent.attachments = [];
+							for (const url of urlArray) {
+								if (url && url.trim()) {
+									const fileData = await saveFile(url.trim());
+									messageContent.attachments.push(fileData);
+								}
+							}
+						}
 					}
 				}
 

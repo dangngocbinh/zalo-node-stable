@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-zalo-stable",
-	"version": "0.8.1",
+	"version": "0.8.5",
 	"description": "Các node hỗ trợ Zalo cho n8n",
 	"keywords": [
 		"n8n-community-node-package",
@@ -79,7 +79,8 @@
 	},
 	"dependencies": {
 		"axios": "^1.8.4",
+		"image-size": "^2.0.2",
 		"pnpm": "^10.6.5",
-		"zca-js": "^2.0.4"
+		"zca-js": "^2.1.2"
 	}
 }
